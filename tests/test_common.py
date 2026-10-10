@@ -70,5 +70,24 @@ class CommonTests(unittest.TestCase):
             self.assertEqual(list(path.parent.glob(".settings.json-*.tmp")), [])
 
 
+class NormalizeColorTests(unittest.TestCase):
+    def test_normalize_color_accepts_six_digit_hex_and_uppercases(self):
+        cases = {
+            "#000000": "#000000",
+            "#ffffff": "#FFFFFF",
+            "#aB12cD": "#AB12CD",
+        }
+        for value, expected in cases.items():
+            with self.subTest(value=value):
+                self.assertEqual(codex_kick75_common.normalize_color(value), expected)
+
+    def test_normalize_color_rejects_invalid_lengths_characters_and_types(self):
+        invalid_values = ("#12345", "#1234567", "123456", "#12x456", None, 123456, True)
+        for value in invalid_values:
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ValueError, "^color must use #RRGGBB format$"):
+                    codex_kick75_common.normalize_color(value)
+
+
 if __name__ == "__main__":
     unittest.main()
